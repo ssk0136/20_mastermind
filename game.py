@@ -4,14 +4,55 @@ from logic import feedback
 
 class Mastermind:
     def __init__(self):
-        self.code = [str(random.randint(1, 6)) for _ in range(4)]
-        self.max_turns = 10
         self.history = []
         self.game_over = False
         self.won = False
+        self.code = []
+        self.code_length = 4
+        self.symbol_limit = 6
+        self.max_turns = 10
+
+    def choose_difficulty(self):
+        print("Choose difficulty:")
+        print("1. Easy")
+        print("2. Medium")
+        print("3. Hard")
+
+        while True:
+            choice = input("Enter 1, 2, or 3: ")
+
+            if choice == "1":
+                self.code_length = 4
+                self.symbol_limit = 4
+                self.max_turns = 12
+                break
+
+            if choice == "2":
+                self.code_length = 4
+                self.symbol_limit = 6
+                self.max_turns = 10
+                break
+
+            if choice == "3":
+                self.code_length = 5
+                self.symbol_limit = 8
+                self.max_turns = 8
+                break
+
+            print("Invalid choice.")
 
     def run(self):
-        print("Mastermind — enter four digits from 1 to 6.")
+        self.choose_difficulty()
+
+        self.code = [
+            str(random.randint(1, self.symbol_limit))
+            for _ in range(self.code_length)
+        ]
+
+        print(
+            f"Mastermind — enter {self.code_length} digits "
+            f"from 1 to {self.symbol_limit}."
+        )
 
         while len(self.history) < self.max_turns and not self.game_over:
             turns_left = self.max_turns - len(self.history)
@@ -22,8 +63,16 @@ class Mastermind:
                 self.game_over = True
                 break
 
-            if len(guess) != 4 or any(ch not in "123456" for ch in guess):
-                print("Invalid guess. Enter exactly four digits from 1 to 6.")
+            valid_symbols = "12345678"[:self.symbol_limit]
+
+            if (
+                len(guess) != self.code_length
+                or any(ch not in valid_symbols for ch in guess)
+            ):
+                print(
+                    f"Invalid guess. Enter exactly {self.code_length} digits "
+                    f"from 1 to {self.symbol_limit}."
+                )
                 continue
 
             exact, partial = feedback(self.code, guess)
@@ -32,7 +81,7 @@ class Mastermind:
 
             print(f"Exact: {exact} Partial: {partial}")
 
-            if exact == 4:
+            if exact == self.code_length:
                 self.won = True
                 self.game_over = True
                 print("You won!")
