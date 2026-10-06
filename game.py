@@ -41,6 +41,18 @@ class Mastermind:
 
             print("Invalid choice.")
 
+    def show_history(self):
+        if not self.history:
+            return
+
+        print("\nGuess History:")
+
+        for i, item in enumerate(self.history, start=1):
+            guess, exact, partial = item
+            print(f"{i}. {guess} -> Exact: {exact}, Partial: {partial}")
+
+        print()
+
     def run(self):
         self.choose_difficulty()
 
@@ -54,9 +66,11 @@ class Mastermind:
             f"from 1 to {self.symbol_limit}."
         )
 
+        print("Enter q to quit.")
+
         while len(self.history) < self.max_turns and not self.game_over:
             turns_left = self.max_turns - len(self.history)
-            guess = input(f"{turns_left} turns left > ")
+            guess = input(f"{turns_left} turns left > ").strip()
 
             if guess.lower() == "q":
                 print("Game ended.")
@@ -65,12 +79,16 @@ class Mastermind:
 
             valid_symbols = "12345678"[:self.symbol_limit]
 
-            if (
-                len(guess) != self.code_length
-                or any(ch not in valid_symbols for ch in guess)
-            ):
+            if len(guess) != self.code_length:
                 print(
-                    f"Invalid guess. Enter exactly {self.code_length} digits "
+                    f"Invalid guess. Enter exactly "
+                    f"{self.code_length} digits."
+                )
+                continue
+
+            if any(ch not in valid_symbols for ch in guess):
+                print(
+                    f"Invalid guess. Use only digits "
                     f"from 1 to {self.symbol_limit}."
                 )
                 continue
@@ -80,6 +98,8 @@ class Mastermind:
             self.history.append((guess, exact, partial))
 
             print(f"Exact: {exact} Partial: {partial}")
+
+            self.show_history()
 
             if exact == self.code_length:
                 self.won = True
